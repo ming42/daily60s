@@ -1,6 +1,6 @@
 # 每天 60 秒读懂世界
 
-利用 `pushplush` / `Server酱` / `企业微信BOT` 实现《每天 60 秒读懂世界》新闻推送，持续更新接口。
+利用多种推送方式实现《每天 60 秒读懂世界》新闻推送，持续更新接口。
 
 ## 使用
 
@@ -21,10 +21,13 @@
 
 ## API
 
-- 图片：`https://api.03c3.cn/api/zb`
-
-- 文字：`https://api.03c3.cn/api/zb?type=text`
-
+|TYPE|API|SRC|
+|---|---|---|
+|PIC|`https://api.03c3.cn/api/zb`|[03c3](https://api.03c3.cn/)|
+|TXT|`https://60s.viki.moe/?encoding=text`|[60s](https://github.com/vikiboss/60s)|
+|JSON|`http://60s-api.viki.moe/v2/60s`|[60s](https://github.com/vikiboss/60s)|
+|TXT|`https://lzw.me/x/iapi/60s/?e=text`|[60s-php](https://github.com/lzwme/60s-php)|
+|JSON|`https://lzw.me/x/iapi/60s/?e=json`|[60s-php](https://github.com/lzwme/60s-php)|
 
 ## Demo
 

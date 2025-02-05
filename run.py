@@ -1,5 +1,6 @@
 import json
 import requests
+from bs4 import BeautifulSoup
 from notify import send
 
 def load_api_config():
@@ -15,34 +16,50 @@ def load_api_config():
 def fetch_news(url):
     """获取每日新闻"""
     print("🔍 正在获取每日新闻...")
-    try:
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
-    except requests.RequestException as e:
-        raise Exception(f"获取每日新闻失败: {e}")
 
-    try:
-        news_data = response.json()
-        if "data" not in news_data or not news_data["data"]:
-            raise Exception("新闻数据不存在或为空")
-        news_list = news_data["data"].get("news", [])
-        weiyu = news_data["data"].get("weiyu", "")
-        image = news_data["data"].get("image", "")
-        if not news_list:
-            raise Exception("新闻列表为空")
-        news_content = "\n".join(news_list) + "\n\n微语：" + weiyu + "\n\n" + f"![image]({image})"
-        print("✅ 新闻获取成功")
-        return news_content
-    except (json.JSONDecodeError, KeyError) as e:
-        raise Exception(f"解析新闻数据失败: {e}")
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # 提取年份
+    year_tag = soup.find('p', string=lambda t: t.strip() == '2025')
+    year = year_tag.get_text(strip=True) if year_tag else "2025"
+
+    # 提取日期
+    date_tag = soup.find('h2', string=True)
+    date = date_tag.get_text(strip=True) if date_tag else ""
+
+    # 提取星期和农历日期
+    md_div = soup.find('div', id='md')
+    ymd_div = soup.find('div', id='ymd')
+    lunar_date = md_div.get_text(strip=True) if md_div else ""
+    ymd_text = ymd_div.get_text(strip=True) if ymd_div else ""
+
+    full_date = f"{year}年{date} {lunar_date}\n{ymd_text}"
+
+    # 提取新闻
+    news_list = []
+    news_title_tag = soup.find('h1', string='「60秒读懂世界」')
+    if news_title_tag:
+        news_section = news_title_tag.find_next('ul')
+        if news_section:
+            news_list = [item.find('a').get_text(strip=True) for item in news_section.find_all('li') if item.find('a')]
+
+    news = ''
+    for news_item in news_list:
+        news += f'{news_item}\n'
+    result = f'{full_date}\n\n{news}'
+    print("✅ 新闻获取成功")
+    return result
 
 def main():
     try:
         config = load_api_config()
         title = "每天60秒读懂世界"
-        content = fetch_news(config["news_api"])
-        result = f'{content}'
-        send(title, result)
+        result = fetch_news(config["news_api"])
+        image_api = config["image_api"]
+        content = f"{result}\n\n![image]({image_api})"
+        print("🚀 新闻推送中...")
+        send(title, content)
         print("✅ 推送已完成，请检查推送结果")
     except Exception as e:
         print(f"❌ 每日新闻获取失败: {e}")

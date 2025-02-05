@@ -1,0 +1,4 @@
+{
+    "news_api": "https://api.southerly.top/api/60s?format=json",
+    "picture_api": "https://api.southerly.top/api/60s?format=image"
+}

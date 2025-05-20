@@ -2,7 +2,7 @@ name: Auto DailyNews
 
 on:
   schedule:
-    - cron: "30 0 * * *"  # 每天 UTC 时间 0:30 运行，相当于北京时间 8:30
+    - cron: "0 0 * * *"  # 每天 UTC 时间 0:30 运行，相当于北京时间 8:30 修改为8:00推送
   workflow_dispatch:
 
 jobs:
